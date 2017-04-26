@@ -22,7 +22,6 @@ def draw_polygons( points, screen, color ):
         y2 = points[i+2][1]
 
         nz = (x1-x0)*(y2-y0) - (y1-y0)*(x2-x0)
-        print nz
         if nz >= 0:
             
             draw_line(int(points[i][0]), int(points[i][1]),

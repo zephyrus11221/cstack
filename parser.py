@@ -52,6 +52,12 @@ def parse_file( fname, edges, transform, screen, color ):
     f = open(fname)
     lines = f.readlines()
 
+    cstack = []
+    m = new_matrix()
+    ident(m)
+    print_matrix(m)
+    cstack.append(m)
+    print cstack
     step = 0.1
     c = 0
     while c < len(lines):
@@ -68,24 +74,36 @@ def parse_file( fname, edges, transform, screen, color ):
             add_sphere(edges,
                        float(args[0]), float(args[1]), float(args[2]),
                        float(args[3]), step)
+            matrix_mult( cstack[-1], edges )
+            draw_polygons(edges, screen, color)
+            edges = []
             
         elif line == 'torus':
             #print 'TORUS\t' + str(args)
             add_torus(edges,
                       float(args[0]), float(args[1]), float(args[2]),
                       float(args[3]), float(args[4]), step)
+            matrix_mult( cstack[-1], edges )
+            draw_polygons(edges, screen, color)
+            edges = []
             
         elif line == 'box':
             #print 'BOX\t' + str(args)
             add_box(edges,
                     float(args[0]), float(args[1]), float(args[2]),
                     float(args[3]), float(args[4]), float(args[5]))
+            matrix_mult( cstack[-1], edges )
+            draw_polygons(edges, screen, color)
+            edges = []
             
         elif line == 'circle':
             #print 'CIRCLE\t' + str(args)
             add_circle(edges,
                        float(args[0]), float(args[1]), float(args[2]),
                        float(args[3]), step)
+            matrix_mult( cstack[-1], edges )
+            draw_polygons(edges, screen, color)
+            edges = []
 
         elif line == 'hermite' or line == 'bezier':
             #print 'curve\t' + line + ": " + str(args)
@@ -95,6 +113,9 @@ def parse_file( fname, edges, transform, screen, color ):
                       float(args[4]), float(args[5]),
                       float(args[6]), float(args[7]),
                       step, line)                      
+            matrix_mult( cstack[-1], edges )
+            draw_polygons(edges, screen, color)
+            edges = []
             
         elif line == 'line':            
             #print 'LINE\t' + str(args)
@@ -102,16 +123,18 @@ def parse_file( fname, edges, transform, screen, color ):
             add_edge( edges,
                       float(args[0]), float(args[1]), float(args[2]),
                       float(args[3]), float(args[4]), float(args[5]) )
+            matrix_mult( cstack[-1], edges )
+            edges = []
 
         elif line == 'scale':
             #print 'SCALE\t' + str(args)
             t = make_scale(float(args[0]), float(args[1]), float(args[2]))
-            matrix_mult(t, transform)
+            matrix_mult(t, cstack[-1])
 
         elif line == 'move':
             #print 'MOVE\t' + str(args)
             t = make_translate(float(args[0]), float(args[1]), float(args[2]))
-            matrix_mult(t, transform)
+            matrix_mult(t, cstack[-1])
 
         elif line == 'rotate':
             #print 'ROTATE\t' + str(args)
@@ -123,7 +146,7 @@ def parse_file( fname, edges, transform, screen, color ):
                 t = make_rotY(theta)
             else:
                 t = make_rotZ(theta)
-            matrix_mult(t, transform)
+            matrix_mult(t, cstack[-1])
                 
         elif line == 'clear':
             edges = []
@@ -132,15 +155,20 @@ def parse_file( fname, edges, transform, screen, color ):
             ident(transform)
 
         elif line == 'apply':
-            matrix_mult( transform, edges )
+            matrix_mult( cstack[-1], edges )
 
         elif line == 'display' or line == 'save':
-            clear_screen(screen)
-            draw_polygons(edges, screen, color)
 
             if line == 'display':
                 display(screen)
             else:
                 save_extension(screen, args[0])
-            
+            clear_screen(screen)
+
+        elif line == 'pop':
+            cstack.pop()
+
+        elif line == 'push':
+            print_matrix(cstack[-1])
+            cstack.append(cstack[-1][:])
         c+= 1

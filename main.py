@@ -64,10 +64,10 @@ for i in range(4):
     matrix_mult(make_rotX(math.pi/2), edges)
     matrix_mult(make_translate(250, 250, 0), edges)
     draw_polygons(edges, screen, color)
+
+display(screen)
 '''
 
 
 
 
-
-display(screen)
