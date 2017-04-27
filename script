@@ -15,7 +15,6 @@ move
 sphere
 0 0 0 50
 pop
-display
 #LEFT ARM
 push
 move
@@ -32,6 +31,7 @@ box
 -10 0 10 20 125 20
 pop
 pop
+#display
 #RIGHT ARM
 push
 move
